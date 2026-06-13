@@ -1,69 +1,79 @@
-package com.ambisonic.frequencymatrix;
-
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
-import android.media.AudioManager;
-import android.os.Build;
-import android.os.IBinder;
-
-public class AudioMatrixService extends Service {
-    private AudioManager audioManager;
-    private AudioFocusRequest focusRequest;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        startForegroundServiceNotification();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        // Request System Audio Focus with "TRANSIENT_MAY_DUCK"
-        // This forces other apps (like games or videos) to automatically lower their volume
-        // so your background music track can sit perfectly balanced underneath them.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
-                    .setAudioAttributes(new AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .build())
-                    .setOnAudioFocusChangeListener(focusChange -> {
-                        // Handle real-time system audio shifts here
-                    })
-                    .build();
-
-            audioManager.requestAudioFocus(focusRequest);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMBISONIC // FREQUENCY MATRIX</title>
+    <style>
+        body {
+            background-color: #0a0a0c;
+            color: #e4e4e7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
         }
-        return START_STICKY;
-    }
-
-    private void startForegroundServiceNotification() {
-        String CHANNEL_ID = "matrix_audio_channel";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "Matrix Core Audio Engine", NotificationManager.IMPORTANCE_LOW);
-            ((NotificationManager) getSystemService(NotificationManager.class)).createNotificationChannel(channel);
+        .container {
+            max-width: 600px;
+            border: 1px solid #27272a;
+            padding: 40px;
+            border-radius: 12px;
+            background: #121214;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
-
-        Notification notification = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            notification = new Notification.Builder(this, CHANNEL_ID)
-                    .setContentTitle("AMBISONIC CORE IS ACTIVE")
-                    .setContentText("Frequency isolation matrix running in background...")
-                    .build();
+        h1 {
+            color: #fff;
+            letter-spacing: 2px;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
         }
-        startForeground(1, notification);
-    }
+        p {
+            color: #a1a1aa;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #fff;
+            color: #000;
+            text-decoration: none;
+            padding: 14px 28px;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.03);
+            background-color: #e4e4e7;
+        }
+        .badge {
+            display: inline-block;
+            background: #27272a;
+            color: #38bdf8;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
 
-    @Override
-    public IBinder onBind(Intent intent) { 
-        return null; 
-    }
-}
+    <div class="container">
+        <div class="badge">Beta v1.0</div>
+        <h1>FREQUENCY MATRIX</h1>
+        <p>Stop letting background media drown out your audio space. Automatically carve custom frequency pockets so you can mix music, videos, and gaming perfectly in real-time.</p>
+        
+        <a href="#" class="btn">DOWNLOAD APK FOR ANDROID</a>
+    </div>
+
+</body>
+</html>
