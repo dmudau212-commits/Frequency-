@@ -3,148 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMBISONIC // AUDIO MATRIX FREQUENCY CONTROLLER</title>
+    <title>AMBISONIC // DEPLOYMENT LABS</title>
     <style>
-        :root {
-            --bg-main: #0a0a0c;
-            --bg-card: #121214;
-            --border-color: #27272a;
-            --accent-glow: #38bdf8;
-            --text-primary: #e4e4e7;
-            --text-secondary: #a1a1aa;
-        }
-
         body {
-            background-color: var(--bg-main);
-            color: var(--text-primary);
+            background-color: #0a0a0c;
+            color: #e4e4e7;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
-            padding: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
         }
-
-        .container {
-            max-width: 500px;
+        .panel {
+            background: #121214;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 450px;
             width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
             text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
-        .logo-area {
-            font-size: 1.8rem;
-            font-weight: 900;
-            letter-spacing: 4px;
-            margin-bottom: 5px;
-            color: var(--text-primary);
+        h1 {
+            font-size: 1.6rem;
+            letter-spacing: 3px;
+            margin: 0 0 10px 0;
         }
-
-        .subtitle {
+        p {
+            color: #a1a1aa;
             font-size: 0.9rem;
-            color: var(--accent-glow);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 40px;
-            font-family: monospace;
-        }
-
-        .product-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            line-height: 1.5;
             margin-bottom: 30px;
         }
-
-        .feature-list {
-            text-align: left;
-            margin: 25px 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 15px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            color: var(--text-secondary);
-        }
-
-        .feature-icon {
-            color: var(--accent-glow);
-            font-weight: bold;
-            font-family: monospace;
-        }
-
-        .btn-download {
+        .btn-install {
             display: block;
-            width: 100%;
-            background: var(--text-primary);
-            color: var(--bg-main);
+            background: #38bdf8;
+            color: #0a0a0c;
             text-decoration: none;
-            padding: 16px;
+            padding: 14px;
+            border-radius: 6px;
             font-weight: bold;
-            border-radius: 8px;
-            font-size: 1rem;
-            letter-spacing: 0.5px;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
+            font-size: 0.95rem;
+            transition: background 0.2s;
         }
-
-        .btn-download:hover {
-            background: #ffffff;
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(56, 189, 248, 0.2);
-        }
-
-        .version-tag {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-family: monospace;
-            margin-top: 15px;
-            display: block;
+        .btn-install:hover {
+            background: #7dd3fc;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <div class="logo-area">AMBISONIC</div>
-        <div class="subtitle">Audio Frequency Matrix Engine</div>
-
-        <div class="product-card">
-            <h2 style="margin-top: 0; font-size: 1.25rem; letter-spacing: 0.5px;">Intelligent Native Audio Balancing</h2>
-            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
-                A native Android utility system that runs locally to isolate, scale, and balance background frequencies based on your active application profile.
-            </p>
-
-            <ul class="feature-list">
-                <li class="feature-item">
-                    <span class="feature-icon">//</span>
-                    <span><strong>App Runtime Synchronization:</strong> Automatically identifies active application paths instantly upon launch.</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">//</span>
-                    <span><strong>Duration Tracking Matrix:</strong> Logs precise usage telemetry to map frequency calibration curves over time.</span>
-                </li>
-                <li class="feature-item">
-                    <span class="feature-icon">//</span>
-                    <span><strong>Dynamic Sidechain Attenuation:</strong> Dips background media seamlessly during key system dialogue events.</span>
-                </li>
-            </ul>
-
-            <a href="#" class="btn-download">DOWNLOAD CLIENT APK</a>
-            <span class="version-tag">v1.0.0-beta // Android 10+ Required</span>
-        </div>
+    <div class="panel">
+        <h1>AMBISONIC</h1>
+        <p>Native Audio Frequency Allocation System client build distribution channel. Download and test the latest automated APK build package directly below.</p>
+        <a href="#" class="btn-install">DOWNLOAD CLIENT APK</a>
     </div>
-
 </body>
 </html>
