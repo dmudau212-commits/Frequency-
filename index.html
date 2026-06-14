@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMBISONIC // FREQUENCY MATRIX</title>
+    <title>AMBISONIC // AUDIO MATRIX FREQUENCY CONTROLLER</title>
     <style>
         :root {
             --bg-main: #0a0a0c;
@@ -20,496 +20,131 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             min-height: 100vh;
         }
 
-        /* --- NAVIGATION TOPBAR --- */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .container {
+            max-width: 500px;
+            width: 100%;
             padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(18, 18, 20, 0.8);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .menu-trigger {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 24px;
-            height: 10px;
-            cursor: pointer;
-            z-index: 110;
-        }
-
-        .menu-line {
-            width: 100%;
-            height: 2px;
-            background-color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .menu-trigger.active .menu-line:nth-child(1) {
-            transform: translateY(4px) rotate(45deg);
-        }
-
-        .menu-trigger.active .menu-line:nth-child(2) {
-            transform: translateY(-4px) rotate(-45deg);
-        }
-
-        .brand-title {
-            font-size: 1.1rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin: 0;
-        }
-
-        .status-pill {
-            background: rgba(161, 161, 170, 0.1);
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            border-radius: 20px;
-            border: 1px solid rgba(161, 161, 170, 0.2);
-            font-weight: bold;
-            transition: all 0.5s ease;
-        }
-
-        .status-pill.active {
-            background: rgba(56, 189, 248, 0.1);
-            color: var(--accent-glow);
-            border-color: rgba(56, 189, 248, 0.3);
-        }
-
-        /* --- SLIDE-OUT CONFIGURATION DRAWER --- */
-        .control-drawer {
-            position: fixed;
-            top: 0;
-            left: -320px;
-            width: 280px;
-            height: 100%;
-            background: var(--bg-card);
-            border-right: 1px solid var(--border-color);
-            box-shadow: 10px 0 30px rgba(0,0,0,0.7);
-            z-index: 105;
-            transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            padding: 80px 20px 20px 20px;
             box-sizing: border-box;
-            overflow-y: auto;
+            text-align: center;
         }
 
-        .control-drawer.open {
-            left: 0;
+        .logo-area {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            margin-bottom: 5px;
+            color: var(--text-primary);
         }
 
-        .drawer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            z-index: 102;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--accent-glow);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            font-family: monospace;
         }
 
-        .drawer-overlay.visible {
-            display: block;
-            opacity: 1;
-        }
-
-        .drawer-section {
+        .product-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             margin-bottom: 30px;
         }
 
-        .drawer-section h3 {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
+        .feature-list {
+            text-align: left;
+            margin: 25px 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
             margin-bottom: 15px;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            font-size: 0.9rem;
-        }
-
-        .setting-value {
-            color: var(--accent-glow);
-            font-family: monospace;
-        }
-
-        .app-list-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-            font-size: 0.9rem;
-            animation: slideInApp 0.3s ease forwards;
-        }
-
-        .app-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .app-dot {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #22c55e;
-        }
-
-        .app-duration {
-            font-family: monospace;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-
-        .no-apps-msg {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            font-style: italic;
-            padding: 5px 0;
-        }
-
-        /* --- MAIN SYSTEM MONITOR DASHBOARD --- */
-        main {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 10;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            margin: 0;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
-        }
-
-        .wave-container {
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 4px;
-            height: 80px;
-            margin: 20px 0;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            padding: 10px;
-        }
-
-        .wave-bar {
-            width: 6px;
-            height: 10%;
-            background: var(--text-secondary);
-            border-radius: 3px;
-        }
-
-        .wave-container.active .wave-bar {
-            background: var(--accent-glow);
-            animation: bounce 1.2s ease-in-out infinite alternate;
-        }
-
-        .wave-container.active .wave-bar:nth-child(2n) { animation-duration: 0.7s; }
-        .wave-container.active .wave-bar:nth-child(3n) { animation-duration: 0.9s; }
-        .wave-container.active .wave-bar:nth-child(5n) { animation-duration: 1.4s; }
-
-        @keyframes bounce {
-            0% { height: 10%; }
-            100% { height: 95%; }
-        }
-
-        .dashboard-runtime-view {
-            background: #050507;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 20px;
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .live-tracker-row {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: #121214;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            box-sizing: border-box;
-            animation: fadeIn 0.4s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .live-app-name {
-            font-weight: bold;
             font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            line-height: 1.4;
+            color: var(--text-secondary);
         }
 
-        .live-timer {
-            font-family: monospace;
-            color: #34d399;
-            background: rgba(52, 211, 153, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        /* --- DASHBOARD ACTION CONTROLS --- */
-        .action-container {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .btn-add-sync {
-            background: transparent;
+        .feature-icon {
             color: var(--accent-glow);
-            border: 1px dashed var(--accent-glow);
-            padding: 12px 24px;
-            border-radius: 6px;
             font-weight: bold;
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s ease;
+            font-family: monospace;
         }
 
-        .btn-add-sync:hover {
-            background: rgba(56, 189, 248, 0.1);
-            border-style: solid;
+        .btn-download {
+            display: block;
+            width: 100%;
+            background: var(--text-primary);
+            color: var(--bg-main);
+            text-decoration: none;
+            padding: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .btn-download:hover {
+            background: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .version-tag {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+            margin-top: 15px;
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+    <div class="container">
+        <div class="logo-area">AMBISONIC</div>
+        <div class="subtitle">Audio Frequency Matrix Engine</div>
 
-    <header>
-        <div class="menu-trigger" id="menuBtn" onclick="toggleDrawer()">
-            <div class="menu-line"></div>
-            <div class="menu-line"></div>
-        </div>
-        <h1 class="brand-title">AMBISONIC</h1>
-        <div class="status-pill" id="systemStatus">STANDBY</div>
-    </header>
+        <div class="product-card">
+            <h2 style="margin-top: 0; font-size: 1.25rem; letter-spacing: 0.5px;">Intelligent Native Audio Balancing</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
+                A native Android utility system that runs locally to isolate, scale, and balance background frequencies based on your active application profile.
+            </p>
 
-    <div class="control-drawer" id="drawer">
-        <div class="drawer-section">
-            <h3>Matrix Settings</h3>
-            <div class="setting-item">
-                <span>System Mode</span>
-                <span class="setting-value" id="modeVal">Idle</span>
-            </div>
-            <div class="setting-item">
-                <span>Frequency Isolation</span>
-                <span class="setting-value">Suspended</span>
-            </div>
-        </div>
+            <ul class="feature-list">
+                <li class="feature-item">
+                    <span class="feature-icon">//</span>
+                    <span><strong>App Runtime Synchronization:</strong> Automatically identifies active application paths instantly upon launch.</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">//</span>
+                    <span><strong>Duration Tracking Matrix:</strong> Logs precise usage telemetry to map frequency calibration curves over time.</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">//</span>
+                    <span><strong>Dynamic Sidechain Attenuation:</strong> Dips background media seamlessly during key system dialogue events.</span>
+                </li>
+            </ul>
 
-        <div class="drawer-section">
-            <h3>Previous Volume Levels</h3>
-            <div class="setting-item">
-                <span>Media Peak</span>
-                <span class="setting-value" id="peakVol">--</span>
-            </div>
-            <div class="setting-item">
-                <span>Background Music</span>
-                <span class="setting-value" id="bgVol">--</span>
-            </div>
-        </div>
-
-        <div class="drawer-section">
-            <h3>Recent Synced Apps</h3>
-            <div id="drawerAppContainer">
-                <div class="no-apps-msg" id="drawerEmptyMsg">No apps synced yet.</div>
-            </div>
+            <a href="#" class="btn-download">DOWNLOAD CLIENT APK</a>
+            <span class="version-tag">v1.0.0-beta // Android 10+ Required</span>
         </div>
     </div>
 
-    <main>
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">Frequency Allocation Matrix</h2>
-                <span id="telemetryStatus" style="font-size: 0.8rem; color: var(--text-secondary); font-family: monospace;">Awaiting Sync...</span>
-            </div>
-            
-            <div class="wave-container" id="waveVisualizer">
-                <div class="wave-bar" style="height: 40%"></div>
-                <div class="wave-bar" style="height: 70%"></div>
-                <div class="wave-bar" style="height: 20%"></div>
-                <div class="wave-bar" style="height: 85%"></div>
-                <div class="wave-bar" style="height: 50%"></div>
-                <div class="wave-bar" style="height: 95%"></div>
-                <div class="wave-bar" style="height: 30%"></div>
-                <div class="wave-bar" style="height: 60%"></div>
-            </div>
-
-            <div class="dashboard-runtime-view" id="mainDashboardView">
-                <div class="no-apps-msg" id="dashEmptyMsg">Connect a running app path to start logging matrix telemetry.</div>
-            </div>
-
-            <div class="action-container">
-                <button class="btn-add-sync" onclick="promptAppSync()">+ ADD SYNC LINK</button>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        const drawer = document.getElementById('drawer');
-        const menuBtn = document.getElementById('menuBtn');
-        const overlay = document.getElementById('overlay');
-        
-        const systemStatus = document.getElementById('systemStatus');
-        const telemetryStatus = document.getElementById('telemetryStatus');
-        const waveVisualizer = document.getElementById('waveVisualizer');
-        
-        const mainDashboardView = document.getElementById('mainDashboardView');
-        const dashEmptyMsg = document.getElementById('dashEmptyMsg');
-        const drawerAppContainer = document.getElementById('drawerAppContainer');
-        const drawerEmptyMsg = document.getElementById('drawerEmptyMsg');
-
-        const modeVal = document.getElementById('modeVal');
-        const peakVol = document.getElementById('peakVol');
-        const bgVol = document.getElementById('bgVol');
-
-        // Main runtime data map tracking active durations
-        let activeApps = {};
-
-        function toggleDrawer() {
-            if (drawer.classList.contains('open')) { closeDrawer(); } else { openDrawer(); }
-        }
-
-        function openDrawer() {
-            drawer.classList.add('open');
-            menuBtn.classList.add('active');
-            overlay.classList.add('visible');
-        }
-
-        function closeDrawer() {
-            drawer.classList.remove('open');
-            menuBtn.classList.remove('active');
-            overlay.classList.remove('visible');
-        }
-
-        // Prompt the developer/tester to input an app name manually to simulate a target sync link
-        function promptAppSync() {
-            const appName = prompt("Enter target application name to establish sync link (e.g., Call of Duty: Mobile, Genshin Impact, YouTube):");
-            if (appName && appName.trim() !== "") {
-                triggerAppSync(appName.trim());
-            }
-        }
-
-        function triggerAppSync(appName) {
-            // Check if app has already been registered to avoid duplicate intervals
-            const cleanId = appName.replace(/[^a-zA-Z0-9]/g, '');
-            if (activeApps[cleanId]) return;
-
-            // Flip system layout states on very first app connection
-            if (Object.keys(activeApps).length === 0) {
-                if (dashEmptyMsg) dashEmptyMsg.remove();
-                if (drawerEmptyMsg) drawerEmptyMsg.remove();
-                
-                systemStatus.textContent = "CORE ACTIVE";
-                systemStatus.classList.add('active');
-                telemetryStatus.textContent = "TELEMETRY LIVE";
-                telemetryStatus.style.color = "var(--accent-glow)";
-                waveVisualizer.classList.add('active');
-                
-                modeVal.textContent = "Dynamic Ducking";
-                peakVol.textContent = "84%";
-                bgVol.textContent = "45%"
-            }
-
-            // Store execution entry object
-            activeApps[cleanId] = { name: appName, seconds: 0 };
-
-            // 1. Build and Inject App Monitor Element inside the Matrix Dashboard Card
-            const dashRow = document.createElement('div');
-            dashRow.className = 'live-tracker-row';
-            dashRow.id = `dash-app-${cleanId}`;
-            dashRow.innerHTML = `
-                <div class="live-app-name"><div class="app-dot"></div> ${appName}</div>
-                <div class="live-timer" id="timer-${cleanId}">00:00</div>
-            `;
-            mainDashboardView.appendChild(dashRow);
-
-            // 2. Build and Inject App Summary row into left configuration drawer panel
-            const drawerRow = document.createElement('div');
-            drawerRow.className = 'app-list-item';
-            drawerRow.id = `drawer-app-${cleanId}`;
-            drawerRow.innerHTML = `
-                <div class="app-info"><div class="app-dot"></div> <span>${appName}</span></div>
-                <div class="app-duration" id="duration-${cleanId}">0s</div>
-            `;
-            drawerAppContainer.appendChild(drawerRow);
-        }
-
-        // Live real-time clock counter loop processing synced applications
-        setInterval(() => {
-            for (let cleanId in activeApps) {
-                activeApps[cleanId].seconds++;
-                
-                let totalSecs = activeApps[cleanId].seconds;
-                let mins = Math.floor(totalSecs / 60).toString().padStart(2, '0');
-                let secs = (totalSecs % 60).toString().padStart(2, '0');
-                
-                const dashTimer = document.getElementById(`timer-${cleanId}`);
-                const drawerDuration = document.getElementById(`duration-${cleanId}`);
-                
-                if (dashTimer) dashTimer.textContent = `${mins}:${secs}`;
-                if (drawerDuration) drawerDuration.textContent = `${totalSecs}s`;
-            }
-        }, 1000);
-    </script>
 </body>
 </html>
