@@ -24,7 +24,7 @@
             min-height: 100vh;
         }
 
-        /* --- TOP HEADER --- */
+        /* --- HEADER NAVBAR --- */
         header {
             display: flex;
             align-items: center;
@@ -38,13 +38,13 @@
             z-index: 100;
         }
 
-        /* Two-Line Menu Icon (Top Left) */
+        /* Two-Line Hamburger Menu Icon */
         .menu-trigger {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             width: 24px;
-            height: 12px;
+            height: 10px;
             cursor: pointer;
             z-index: 110;
         }
@@ -57,11 +57,11 @@
         }
 
         .menu-trigger.active .menu-line:nth-child(1) {
-            transform: translateY(5px) rotate(45deg);
+            transform: translateY(4px) rotate(45deg);
         }
 
         .menu-trigger.active .menu-line:nth-child(2) {
-            transform: translateY(-5px) rotate(-45deg);
+            transform: translateY(-4px) rotate(-45deg);
         }
 
         .brand-title {
@@ -81,7 +81,7 @@
             font-weight: bold;
         }
 
-        /* --- SLIDE-OUT CONTROL DRAWER --- */
+        /* --- SLIDE-OUT CONFIGURATION DRAWER --- */
         .control-drawer {
             position: fixed;
             top: 0;
@@ -144,7 +144,7 @@
             border-radius: 50%;
         }
 
-        /* --- MAIN TELEMETRY DASHBOARD --- */
+        /* --- MAIN SYSTEM MONITOR DASHBOARD --- */
         main {
             max-width: 800px;
             margin: 40px auto;
@@ -152,17 +152,12 @@
             box-sizing: border-box;
         }
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 25px;
+            margin-bottom: 20px;
         }
 
         .card-header {
@@ -178,7 +173,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Animated Live Audio Waves Visualization */
+        /* Animated Live Audio Equalizer Modules */
         .wave-container {
             display: flex;
             align-items: flex-end;
@@ -199,7 +194,6 @@
             animation: bounce 1.2s ease-in-out infinite alternate;
         }
 
-        /* Varying animation speeds */
         .wave-bar:nth-child(2n) { animation-duration: 0.7s; }
         .wave-bar:nth-child(3n) { animation-duration: 0.9s; }
         .wave-bar:nth-child(5n) { animation-duration: 1.4s; }
@@ -209,7 +203,7 @@
             100% { height: 95%; }
         }
 
-        /* Live Activity Console */
+        /* Live Scrolling Log Console */
         .console-log {
             background: #050507;
             border: 1px solid var(--border-color);
@@ -217,8 +211,158 @@
             padding: 15px;
             font-family: monospace;
             font-size: 0.8rem;
-            height: 150px;
+            height: 160px;
             overflow-y: hidden;
             color: #34d399;
             line-height: 1.6;
         }
+
+        .console-line {
+            margin: 4px 0;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .download-footer {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn-download {
+            display: inline-block;
+            background: var(--text-primary);
+            color: var(--bg-main);
+            text-decoration: none;
+            padding: 14px 28px;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: transform 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="menu-trigger" id="menuBtn" onclick="toggleDrawer()">
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+        </div>
+        <h1 class="brand-title">AMBISONIC</h1>
+        <div class="status-pill">CORE ACTIVE</div>
+    </header>
+
+    <div class="control-drawer" id="drawer">
+        <div class="drawer-section">
+            <h3>Matrix Settings</h3>
+            <div class="setting-item">
+                <span>System Mode</span>
+                <span class="setting-value">Dynamic Ducking</span>
+            </div>
+            <div class="setting-item">
+                <span>Frequency Isolation</span>
+                <span class="setting-value">500Hz - 2kHz Scoop</span>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h3>Previous Volume Levels</h3>
+            <div class="setting-item">
+                <span>Media Peak</span>
+                <span class="setting-value">84%</span>
+            </div>
+            <div class="setting-item">
+                <span>Background Music</span>
+                <span class="setting-value">45%</span>
+            </div>
+        </div>
+
+        <div class="drawer-section">
+            <h3>Connected App Matrix</h3>
+            <div class="app-list-item">
+                <div class="app-dot"></div>
+                <span>Call of Duty: Mobile</span>
+            </div>
+            <div class="app-list-item">
+                <div class="app-dot"></div>
+                <span>YouTube Media Service</span>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Frequency Allocation Matrix</h2>
+                <span style="font-size: 0.8rem; color: var(--accent-glow); font-family: monospace;">Telemetry Live</span>
+            </div>
+            
+            <div class="wave-container">
+                <div class="wave-bar" style="height: 40%"></div>
+                <div class="wave-bar" style="height: 70%"></div>
+                <div class="wave-bar" style="height: 20%"></div>
+                <div class="wave-bar" style="height: 85%"></div>
+                <div class="wave-bar" style="height: 50%"></div>
+                <div class="wave-bar" style="height: 95%"></div>
+                <div class="wave-bar" style="height: 30%"></div>
+                <div class="wave-bar" style="height: 60%"></div>
+            </div>
+
+            <div class="console-log" id="consoleBox"></div>
+        </div>
+
+        <div class="download-footer">
+            <a href="#" class="btn-download">DOWNLOAD TEST APK</a>
+        </div>
+    </main>
+
+    <script>
+        function toggleDrawer() {
+            const drawer = document.getElementById('drawer');
+            const menuBtn = document.getElementById('menuBtn');
+            drawer.classList.toggle('open');
+            menuBtn.classList.toggle('active');
+        }
+
+        const logMessages = [
+            "[INFO] Ambisonic Audio Core initialization verified.",
+            "[MATRIX] Hooked master hardware system audio output bus successfully.",
+            "[ISOLATION] Mid-range dialogue frequencies (500Hz - 2kHz) isolated.",
+            "[CONNECT] Target session identified: Call of Duty: Mobile.",
+            "[CONNECT] Target session identified: YouTube Media Stream.",
+            "[PROCESSING] Dynamic sidechain attenuation activated; music level set to 45%.",
+            "[AUDIO] Game dialogue spike detected -> Ducking background music track by -12dB.",
+            "[AUDIO] Dialogue pause registered -> Swelling background track seamlessly.",
+            "[MONITOR] Device telemetry clear. Matrix framework status: stable 60 FPS."
+        ];
+
+        const consoleBox = document.getElementById('consoleBox');
+
+        function appendConsoleLine() {
+            if (!consoleBox) return;
+            const randomLineText = logMessages[Math.floor(Math.random() * logMessages.length)];
+            const timeStamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            const lineElement = document.createElement('div');
+            lineElement.className = 'console-line';
+            lineElement.innerHTML = `<span style="color: #6b7280;">[${timeStamp}]</span> ${randomLineText}`;
+            
+            consoleBox.appendChild(lineElement);
+
+            if (consoleBox.children.length > 5) {
+                consoleBox.removeChild(consoleBox.children[0]);
+            }
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        setInterval(appendConsoleLine, 2000);
+        window.onload = function() {
+            appendConsoleLine();
+            appendConsoleLine();
+        };
+    </script>
+</body>
+</html>
