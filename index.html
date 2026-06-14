@@ -24,7 +24,7 @@
             min-height: 100vh;
         }
 
-        /* --- HEADER NAVBAR --- */
+        /* --- NAVIGATION TOPBAR --- */
         header {
             display: flex;
             align-items: center;
@@ -102,6 +102,26 @@
             left: 0;
         }
 
+        /* Interactive Backdrop Overlay to intercept taps and close drawer */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 102;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .drawer-overlay.visible {
+            display: block;
+            opacity: 1;
+        }
+
         .drawer-section {
             margin-bottom: 30px;
         }
@@ -129,12 +149,19 @@
             font-family: monospace;
         }
 
+        /* Dynamic App Matrix Container */
         .app-list-item {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 8px 0;
             font-size: 0.9rem;
+            animation: slideInApp 0.3s ease forwards;
+        }
+
+        @keyframes slideInApp {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .app-dot {
@@ -142,6 +169,14 @@
             height: 8px;
             background: #22c55e;
             border-radius: 50%;
+            box-shadow: 0 0 8px #22c55e;
+        }
+
+        .no-apps-msg {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            padding: 5px 0;
         }
 
         /* --- MAIN SYSTEM MONITOR DASHBOARD --- */
@@ -150,6 +185,8 @@
             margin: 40px auto;
             padding: 0 20px;
             box-sizing: border-box;
+            position: relative;
+            z-index: 10;
         }
 
         .card {
@@ -246,6 +283,8 @@
 </head>
 <body>
 
+    <div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+
     <header>
         <div class="menu-trigger" id="menuBtn" onclick="toggleDrawer()">
             <div class="menu-line"></div>
@@ -281,14 +320,9 @@
         </div>
 
         <div class="drawer-section">
-            <h3>Connected App Matrix</h3>
-            <div class="app-list-item">
-                <div class="app-dot"></div>
-                <span>Call of Duty: Mobile</span>
-            </div>
-            <div class="app-list-item">
-                <div class="app-dot"></div>
-                <span>YouTube Media Service</span>
+            <h3>Recent Synced Apps</h3>
+            <div id="dynamicAppContainer">
+                <div class="no-apps-msg" id="emptyMsg">Waiting for system sync link...</div>
             </div>
         </div>
     </div>
@@ -320,37 +354,88 @@
     </main>
 
     <script>
+        const drawer = document.getElementById('drawer');
+        const menuBtn = document.getElementById('menuBtn');
+        const overlay = document.getElementById('overlay');
+        const dynamicAppContainer = document.getElementById('dynamicAppContainer');
+        const emptyMsg = document.getElementById('emptyMsg');
+
+        // Track verified synced apps so duplicates aren't added
+        const detectedApps = new Set();
+
+        // Dual Action Trigger
         function toggleDrawer() {
-            const drawer = document.getElementById('drawer');
-            const menuBtn = document.getElementById('menuBtn');
-            drawer.classList.toggle('open');
-            menuBtn.classList.toggle('active');
+            const isOpen = drawer.classList.contains('open');
+            if (isOpen) {
+                closeDrawer();
+            } else {
+                openDrawer();
+            }
         }
 
+        function openDrawer() {
+            drawer.classList.add('open');
+            menuBtn.classList.add('active');
+            overlay.classList.add('visible');
+        }
+
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            menuBtn.classList.remove('active');
+            overlay.classList.remove('visible');
+        }
+
+        // Master log streams with target app identifiers inside brackets
         const logMessages = [
-            "[INFO] Ambisonic Audio Core initialization verified.",
-            "[MATRIX] Hooked master hardware system audio output bus successfully.",
-            "[ISOLATION] Mid-range dialogue frequencies (500Hz - 2kHz) isolated.",
-            "[CONNECT] Target session identified: Call of Duty: Mobile.",
-            "[CONNECT] Target session identified: YouTube Media Stream.",
-            "[PROCESSING] Dynamic sidechain attenuation activated; music level set to 45%.",
-            "[AUDIO] Game dialogue spike detected -> Ducking background music track by -12dB.",
-            "[AUDIO] Dialogue pause registered -> Swelling background track seamlessly.",
-            "[MONITOR] Device telemetry clear. Matrix framework status: stable 60 FPS."
+            { text: "[INFO] Ambisonic Audio Core initialization verified.", app: null },
+            { text: "[MATRIX] Hooked master hardware system audio output bus successfully.", app: null },
+            { text: "[CONNECT] Target session identified: [Call of Duty: Mobile]", app: "Call of Duty: Mobile" },
+            { text: "[CONNECT] Target session identified: [YouTube Media Stream]", app: "YouTube Media Stream" },
+            { text: "[CONNECT] Target session identified: [Genshin Impact]", app: "Genshin Impact" },
+            { text: "[PROCESSING] Dynamic sidechain attenuation activated; music level set to 45%.", app: null },
+            { text: "[AUDIO] Audio frequency spike detected -> Ducking background track by -12dB.", app: null },
+            { text: "[AUDIO] Dialogue pause registered -> Swelling background track seamlessly.", app: null },
+            { text: "[MONITOR] Device telemetry clear. Matrix framework status: stable 60 FPS.", app: null }
         ];
 
         const consoleBox = document.getElementById('consoleBox');
 
+        // Dynamically append new apps to the panel layout when they appear in logs
+        function syncNewApp(appName) {
+            if (!appName || detectedApps.has(appName)) return;
+
+            detectedApps.add(appName);
+
+            // Wipe out the initial "Waiting..." text on first detection
+            if (emptyMsg) {
+                emptyMsg.remove();
+            }
+
+            const appRow = document.createElement('div');
+            appRow.className = 'app-list-item';
+            appRow.innerHTML = `
+                <div class="app-dot"></div>
+                <span>${appName}</span>
+            `;
+            dynamicAppContainer.appendChild(appRow);
+        }
+
         function appendConsoleLine() {
             if (!consoleBox) return;
-            const randomLineText = logMessages[Math.floor(Math.random() * logMessages.length)];
+            
+            const logObj = logMessages[Math.floor(Math.random() * logMessages.length)];
             const timeStamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             
             const lineElement = document.createElement('div');
             lineElement.className = 'console-line';
-            lineElement.innerHTML = `<span style="color: #6b7280;">[${timeStamp}]</span> ${randomLineText}`;
+            lineElement.innerHTML = `<span style="color: #6b7280;">[${timeStamp}]</span> ${logObj.text}`;
             
             consoleBox.appendChild(lineElement);
+
+            // If this log contains an app sync connection, pass it to the list builder
+            if (logObj.app) {
+                syncNewApp(logObj.app);
+            }
 
             if (consoleBox.children.length > 5) {
                 consoleBox.removeChild(consoleBox.children[0]);
@@ -358,7 +443,7 @@
             consoleBox.scrollTop = consoleBox.scrollHeight;
         }
 
-        setInterval(appendConsoleLine, 2000);
+        setInterval(appendConsoleLine, 2200);
         window.onload = function() {
             appendConsoleLine();
             appendConsoleLine();
