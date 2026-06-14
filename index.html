@@ -254,18 +254,18 @@
             100% { height: 95%; }
         }
 
-        /* Live Activity Tracking Dashboard View */
         .dashboard-runtime-view {
             background: #050507;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 20px;
-            min-height: 120px;
+            min-height: 100px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             gap: 10px;
+            margin-bottom: 20px;
         }
 
         .live-tracker-row {
@@ -303,20 +303,30 @@
             font-weight: bold;
         }
 
-        .download-footer {
-            text-align: center;
-            margin-top: 40px;
+        /* --- DASHBOARD ACTION CONTROLS --- */
+        .action-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
 
-        .btn-download {
-            display: inline-block;
-            background: var(--text-primary);
-            color: var(--bg-main);
-            text-decoration: none;
-            padding: 14px 28px;
-            font-weight: bold;
+        .btn-add-sync {
+            background: transparent;
+            color: var(--accent-glow);
+            border: 1px dashed var(--accent-glow);
+            padding: 12px 24px;
             border-radius: 6px;
-            transition: transform 0.2s;
+            font-weight: bold;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-sync:hover {
+            background: rgba(56, 189, 248, 0.1);
+            border-style: solid;
         }
     </style>
 </head>
@@ -387,10 +397,10 @@
             <div class="dashboard-runtime-view" id="mainDashboardView">
                 <div class="no-apps-msg" id="dashEmptyMsg">Connect a running app path to start logging matrix telemetry.</div>
             </div>
-        </div>
 
-        <div class="download-footer">
-            <a href="#" class="btn-download">DOWNLOAD TEST APK</a>
+            <div class="action-container">
+                <button class="btn-add-sync" onclick="promptAppSync()">+ ADD SYNC LINK</button>
+            </div>
         </div>
     </main>
 
@@ -412,7 +422,7 @@
         const peakVol = document.getElementById('peakVol');
         const bgVol = document.getElementById('bgVol');
 
-        // Track running durations for targeted system apps
+        // Main runtime data map tracking active durations
         let activeApps = {};
 
         function toggleDrawer() {
@@ -431,11 +441,20 @@
             overlay.classList.remove('visible');
         }
 
-        // Simulating the exact moment an app syncs to the matrix system
-        function triggerAppSync(appName) {
-            if (activeApps[appName]) return;
+        // Prompt the developer/tester to input an app name manually to simulate a target sync link
+        function promptAppSync() {
+            const appName = prompt("Enter target application name to establish sync link (e.g., Call of Duty: Mobile, Genshin Impact, YouTube):");
+            if (appName && appName.trim() !== "") {
+                triggerAppSync(appName.trim());
+            }
+        }
 
-            // Activate visualizers on first real connection
+        function triggerAppSync(appName) {
+            // Check if app has already been registered to avoid duplicate intervals
+            const cleanId = appName.replace(/[^a-zA-Z0-9]/g, '');
+            if (activeApps[cleanId]) return;
+
+            // Flip system layout states on very first app connection
             if (Object.keys(activeApps).length === 0) {
                 if (dashEmptyMsg) dashEmptyMsg.remove();
                 if (drawerEmptyMsg) drawerEmptyMsg.remove();
@@ -448,44 +467,42 @@
                 
                 modeVal.textContent = "Dynamic Ducking";
                 peakVol.textContent = "84%";
-                bgVol.textContent = "45%";
+                bgVol.textContent = "45%"
             }
 
-            // Create baseline data tracking blueprint
-            activeApps[appName] = { seconds: 0 };
+            // Store execution entry object
+            activeApps[cleanId] = { name: appName, seconds: 0 };
 
-            // 1. Build and append Row to the MAIN Dashboard space
+            // 1. Build and Inject App Monitor Element inside the Matrix Dashboard Card
             const dashRow = document.createElement('div');
             dashRow.className = 'live-tracker-row';
-            dashRow.id = `dash-app-${appName.replace(/\s+/g, '')}`;
+            dashRow.id = `dash-app-${cleanId}`;
             dashRow.innerHTML = `
                 <div class="live-app-name"><div class="app-dot"></div> ${appName}</div>
-                <div class="live-timer" id="timer-${appName.replace(/\s+/g, '')}">00:00</div>
+                <div class="live-timer" id="timer-${cleanId}">00:00</div>
             `;
             mainDashboardView.appendChild(dashRow);
 
-            // 2. Build and append Row to the LEFT Drawer panel list
+            // 2. Build and Inject App Summary row into left configuration drawer panel
             const drawerRow = document.createElement('div');
             drawerRow.className = 'app-list-item';
-            drawerRow.id = `drawer-app-${appName.replace(/\s+/g, '')}`;
+            drawerRow.id = `drawer-app-${cleanId}`;
             drawerRow.innerHTML = `
                 <div class="app-info"><div class="app-dot"></div> <span>${appName}</span></div>
-                <div class="app-duration" id="duration-${appName.replace(/\s+/g, '')}">0s</div>
+                <div class="app-duration" id="duration-${cleanId}">0s</div>
             `;
             drawerAppContainer.appendChild(drawerRow);
         }
 
-        // Background clock engine that increments duration totals every second
+        // Live real-time clock counter loop processing synced applications
         setInterval(() => {
-            for (let appName in activeApps) {
-                activeApps[appName].seconds++;
+            for (let cleanId in activeApps) {
+                activeApps[cleanId].seconds++;
                 
-                let totalSecs = activeApps[appName].seconds;
+                let totalSecs = activeApps[cleanId].seconds;
                 let mins = Math.floor(totalSecs / 60).toString().padStart(2, '0');
                 let secs = (totalSecs % 60).toString().padStart(2, '0');
                 
-                // Update timers in both user locations
-                const cleanId = appName.replace(/\s+/g, '');
                 const dashTimer = document.getElementById(`timer-${cleanId}`);
                 const drawerDuration = document.getElementById(`duration-${cleanId}`);
                 
@@ -493,12 +510,6 @@
                 if (drawerDuration) drawerDuration.textContent = `${totalSecs}s`;
             }
         }, 1000);
-
-        // Simulated launch sequencer: Nothing shows at startup, apps pop up sequentially to test tracking pipeline
-        window.onload = function() {
-            setTimeout(() => { triggerAppSync("Call of Duty: Mobile"); }, 3000);
-            setTimeout(() => { triggerAppSync("Genshin Impact"); }, 9000);
-        };
     </script>
 </body>
 </html>
